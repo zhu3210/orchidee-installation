@@ -1,0 +1,33 @@
+%CCOMPILER      mpicxx
+%FCOMPILER      mpif90
+%LINKER         mpif90
+
+%MAKE           /usr/bin/make
+%CPP            /usr/bin/cpp
+%FPP            /usr/bin/cpp
+
+%BASE_CFLAGS    -w
+%PROD_CFLAGS    -O3 -D BOOST_DISABLE_ASSERTS
+%DEV_CFLAGS     -g
+%DEBUG_CFLAGS   -g
+
+%BASE_FFLAGS    -D__NONE__ -ffree-line-length-none
+%PROD_FFLAGS    -O3
+%DEV_FFLAGS     -g -O2
+%DEBUG_FFLAGS   -g
+
+%BASE_INC       -D__NONE__
+
+%MPI_INC        -I$(shell mpicxx --showme:incdirs)
+%MPI_LIB        $(shell mpicxx --showme:libdirs) $(shell mpicxx --showme:libs)
+
+%NETCDF_INCDIR  -I$(spack location -i netcdf-c@4.7.4)/include \
+                 -I$(spack location -i netcdf-fortran@4.5.3)/include
+
+%NETCDF_LIBDIR  -L$(spack location -i netcdf-c@4.7.4)/lib \
+                 -L$(spack location -i netcdf-fortran@4.5.3)/lib
+
+%NETCDF_LIB     -lnetcdff -lnetcdf
+
+%BASE_LD        -lstdc++
+

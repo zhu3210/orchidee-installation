@@ -1,0 +1,18 @@
+ROOT=$PWD
+
+NETCDF_INCDIR="-I$(spack location -i netcdf-c@4.7.4)/include \
+               -I$(spack location -i netcdf-fortran@4.5.3)/include"
+
+NETCDF_LIBDIR="-L$(spack location -i netcdf-c@4.7.4)/lib \
+               -L$(spack location -i netcdf-fortran@4.5.3)/lib"
+
+NETCDF_LIB="-lnetcdff -lnetcdf"
+
+IOIPSL_INCDIR="-I$ROOT/../IOIPSL/inc"
+IOIPSL_LIBDIR="-L$ROOT/../IOIPSL/lib"
+IOIPSL_LIB="-lioipsl"
+
+XIOS_INCDIR="-I$ROOT/../XIOS/inc"
+XIOS_LIBDIR="-L$ROOT/../XIOS/lib"
+XIOS_LIB="-lxios -lstdc++"
+

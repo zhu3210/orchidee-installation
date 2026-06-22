@@ -1,0 +1,27 @@
+%COMPILER       mpif90
+%LINK           mpif90
+%AR             ar
+%MAKE           make
+
+%FPP            cpp -P
+%FPP_FLAGS      -P -traditional
+%FPP_DEF        KEY_NONE CPP_NETCDF4
+
+%BASE_FFLAGS    -D__NONE__ -fdefault-real-8 -fdefault-double-8
+%PROD_FFLAGS    -O3 -ffree-line-length-none
+%DEV_FFLAGS     -g -O2
+%DEBUG_FFLAGS   -g
+
+%MPI_FFLAGS     -I$(shell mpif90 --showme:incdirs)
+%MPI_LD         $(shell mpif90 --showme:libdirs) $(shell mpif90 --showme:libs)
+
+%NETCDF_INCDIR  -I$(spack location -i netcdf-c@4.7.4)/include \
+                 -I$(spack location -i netcdf-fortran@4.5.3)/include
+
+%NETCDF_LIBDIR  -L$(spack location -i netcdf-c@4.7.4)/lib \
+                 -L$(spack location -i netcdf-fortran@4.5.3)/lib
+
+%NETCDF_LIB     -lnetcdff -lnetcdf
+
+%BASE_LD        -lstdc++
+
