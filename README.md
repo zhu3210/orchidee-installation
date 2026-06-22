@@ -32,7 +32,6 @@ The main goal is to avoid version conflicts between MPI, HDF5, NetCDF, IOIPSL, X
         └── arch-gcc_pc.path
 ```
 
-The original Word draft is intentionally not tracked because it may contain local notes or access credentials.
 
 ## 1. Install Ubuntu and GCC
 
@@ -51,6 +50,7 @@ Check the compiler version:
 gcc --version
 gfortran --version
 ```
+If you use a newer Ubuntu release, the default GCC version may be higher, which could lead to unexpected compatibility issues when compiling ORCHIDEE and its dependencies.
 
 ## 2. Install Spack
 
@@ -87,6 +87,12 @@ gcc@13.3.0:
     operating system = ubuntu24.04
 ```
 
+Make sure that gfortran is installed. If it is not available, install it using:
+```bash
+sudo apt update
+sudo apt install gfortran
+```
+
 ## 3. Install OpenMPI, HDF5, and NetCDF
 
 Install the required libraries in this order:
@@ -98,18 +104,6 @@ spack install netcdf-c@4.7.4 +mpi %gcc@13 ^hdf5@1.10.7 ^openmpi@4.0.7
 spack install netcdf-fortran@4.5.3 %gcc@13 ^netcdf-c@4.7.4
 ```
 
-Load the environment:
-
-```bash
-source ~/spack/share/spack/setup-env.sh
-spack load openmpi@4.0.7
-spack load hdf5@1.10.7
-spack load netcdf-c@4.7.4
-spack load netcdf-fortran@4.5.3
-```
-
-If there are multiple matching Spack installations, use `spack find -l <package>` and load the package with its hash.
-
 ## 4. Download ORCHIDEE
 
 Clone `modipsl` and download ORCHIDEE:
@@ -120,7 +114,8 @@ cd modipsl/util
 ./model ORCHIDEE_trunk
 ```
 
-Some ORCHIDEE or IPSL resources may require institutional credentials. Do not commit usernames, passwords, or access tokens to this repository.
+Some ORCHIDEE or IPSL resources may require institutional credentials. Detailed installation instructions can be found in the official ORCHIDEE documentation.
+
 
 ## 5. Modify arch files
 
@@ -154,8 +149,6 @@ cp arch/xios/arch-gcc_pc.fcm ~/modipsl/modeles/XIOS/arch/
 cp arch/xios/arch-gcc_pc.path ~/modipsl/modeles/XIOS/arch/
 ```
 
-If your local ORCHIDEE checkout uses different arch directories, copy the files to the matching `ARCH` or `arch` directory in your checkout.
-
 ## 6. Compile and test ORCHIDEE
 
 Go to the ORCHIDEE offline configuration directory:
@@ -176,7 +169,18 @@ After a successful compilation, ORCHIDEE can be launched directly with:
 ./orchideedriver
 ```
 
-## 7. Optional: avoid specifying `-arch` every time
+## 7. Notes on compilation issues
+
+IOIPSL and XIOS may compile without major changes, but ORCHIDEE itself can fail with GCC because GCC is stricter than Intel compilers used on some institutional systems.
+
+When compilation errors occur:
+
+1. Read the compiler error message carefully.
+2. Identify the source file and line reported by the compiler.
+3. Modify the corresponding source code if the error is caused by GCC compatibility.
+4. Recompile until the build completes.
+
+## 8. Optional: avoid specifying `-arch` every time
 
 If you do not want to manually pass `-arch gcc_pc` for each compilation, edit `compile_orchidee_ol.sh` and add your hostname to the architecture detection block:
 
@@ -185,6 +189,7 @@ if [ $fcm_arch == default ] ; then
     case $( hostname -s ) in
         jean-zay*)
             fcm_arch=X64_JEANZAY;;
+......
         your-hostname)
             fcm_arch=gcc_pc;;
         *)
@@ -201,17 +206,6 @@ Replace `your-hostname` with the output of:
 hostname -s
 ```
 
-## 8. Notes on compilation issues
-
-IOIPSL and XIOS may compile without major changes, but ORCHIDEE itself can fail with GCC because GCC is stricter than Intel compilers used on some institutional systems.
-
-When compilation errors occur:
-
-1. Read the compiler error message carefully.
-2. Identify the source file and line reported by the compiler.
-3. Modify the corresponding source code if the error is caused by GCC compatibility.
-4. Recompile until the build completes.
-
 ## 9. Running ORCHIDEE with libIGCM
 
 ORCHIDEE can be run directly with `orchideedriver`, but using libIGCM is recommended for a more standardized simulation workflow.
@@ -219,7 +213,7 @@ ORCHIDEE can be run directly with `orchideedriver`, but using libIGCM is recomme
 For a local machine that is not included in the official libIGCM system list, edit:
 
 ```text
-~/libIGCM/libIGCM_sys/libIGCM_sys_default.ksh
+~/modipsl/libIGCM/libIGCM_sys/libIGCM_sys_default.ksh
 ```
 
 Set the output directory, for example:
@@ -233,6 +227,7 @@ Set the temporary run directory, for example:
 ```bash
 typeset -r RUN_DIR_PATH=${RUN_DIR_PATH:=/home/scratch01/$LOGIN/RUN_DIR/$PBS_O_LOGNAME.$PBS_JOBID}
 ```
+This path defines where intermediate files and temporary simulation data are stored during job execution.
 
 Adjust these paths to match the local storage layout of your machine or server.
 
@@ -240,9 +235,8 @@ Adjust these paths to match the local storage layout of your machine or server.
 
 - Make sure Spack is sourced before compiling.
 - Make sure the same OpenMPI, HDF5, NetCDF-C, and NetCDF-Fortran stack is used everywhere.
-- If `spack load` is ambiguous, load packages with their hashes.
-- If NetCDF headers or libraries are not found, check `spack location -i netcdf-c@4.7.4` and `spack location -i netcdf-fortran@4.5.3`.
-- If MPI wrappers are not found, check `which mpif90`, `which mpicxx`, and `mpif90 --showme`.
+- Remember to ask AI when you find unexpected errors.
+
 
 ## Credits
 
