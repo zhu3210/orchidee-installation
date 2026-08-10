@@ -216,12 +216,6 @@ For a local machine that is not included in the official libIGCM system list, ed
 ~/modipsl/libIGCM/libIGCM_sys/libIGCM_sys_default.ksh
 ```
 
-Set the output directory, for example:
-
-```bash
-typeset -r RUN_DIR_PATH=${RUN_DIR_PATH:=/home_local/${LOGIN}/RUN_DIR/tmp$$}
-```
-
 Set the temporary run directory, for example:
 
 ```bash
